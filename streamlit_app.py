@@ -9,7 +9,7 @@ matplotlib.rcParams['font.family'] = 'DejaVu Sans'
 st.set_page_config(page_title="Titanic Dashboard", layout="wide")
 
 # Заголовок
-st.title("🚢 Titanic Passenger Analysis")
+st.title("Titanic Passenger Analysis")
 st.markdown("---")
 
 # Загрузка данных
@@ -40,7 +40,7 @@ st.sidebar.header("Settings")
 st.sidebar.info("Use the tabs below to explore different aspects of the data")
 
 # 1. ОПИСАТЕЛЬНАЯ СТАТИСТИКА
-st.header("📊 Descriptive Statistics")
+st.header(" Descriptive Statistics")
 
 col1, col2 = st.columns(2)
 
@@ -64,7 +64,7 @@ with col2:
 st.markdown("---")
 
 # 2. ГРАФИКИ
-st.header("📈 Data Visualization")
+st.header(" Data Visualization")
 
 # Создаем вкладки
 tab1, tab2, tab3, tab4, tab5 = st.tabs(["Survival", "Age", "Class", "Gender", "Fare"])
