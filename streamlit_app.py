@@ -90,7 +90,7 @@ with tab3:
     st.subheader("Распределение по классам")
     fig, ax = plt.subplots()
     class_counts = df['Pclass'].value_counts().sort_index()
-    ax.bar(['1 класс', '2 класс', '3 класс'], class_counts.values, color=['#3498db', '#2ecc71', '#e74c3c'])
+    ax.bar(['1 класс', '2 класс', '3 класс'], list(class_counts.values), color=['#3498db', '#2ecc71', '#e74c3c'])
     st.pyplot(fig)
 
 # График 4: Пол
