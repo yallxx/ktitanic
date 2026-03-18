@@ -7,13 +7,12 @@ import numpy as np
 st.set_page_config(page_title="Анализ Титаника", layout="wide")
 
 # Заголовок
-st.title(" Анализ пассажиров Титаника")
+st.title("Анализ пассажиров Титаника")
 st.markdown("---")
 
 # Загрузка данных
 @st.cache_data
 def load_data():
-    # Создаем небольшие тестовые данные, если файл не найден
     try:
         df = pd.read_csv('titanic.csv')
     except:
@@ -71,26 +70,56 @@ with tab1:
     st.subheader("Распределение выживших и погибших")
     fig, ax = plt.subplots()
     survived_counts = df['Survived'].value_counts()
+    
+    # Проверяем, что есть оба значения (0 и 1)
+    survived_dict = {0: 0, 1: 0}
+    for idx, val in survived_counts.items():
+        survived_dict[idx] = val
+    
     labels = ['Погиб', 'Выжил']
     colors = ['#ff6b6b', '#4ecdc4']
-    ax.bar(labels, survived_counts.values, color=colors)
+    ax.bar(labels, [survived_dict[0], survived_dict[1]], color=colors)
+    ax.set_ylabel('Количество')
     st.pyplot(fig)
 
 # График 2: Возраст
 with tab2:
     st.subheader("Распределение возраста")
     fig, ax = plt.subplots()
-    ax.hist(df['Age'].dropna(), bins=20, color='#95a5a6', edgecolor='black')
-    ax.set_xlabel('Возраст')
-    ax.set_ylabel('Количество')
+    age_data = df['Age'].dropna()
+    if len(age_data) > 0:
+        ax.hist(age_data, bins=20, color='#95a5a6', edgecolor='black')
+        ax.set_xlabel('Возраст')
+        ax.set_ylabel('Количество')
+    else:
+        ax.text(0.5, 0.5, 'Нет данных о возрасте', ha='center')
     st.pyplot(fig)
 
-# График 3: Классы
+# График 3: Классы (ИСПРАВЛЕНО!)
 with tab3:
     st.subheader("Распределение по классам")
     fig, ax = plt.subplots()
-    class_counts = df['Pclass'].value_counts().sort_index()
-    ax.bar(['1 класс', '2 класс', '3 класс'], list(class_counts.values), color=['#3498db', '#2ecc71', '#e74c3c'])
+    
+    # Получаем количество для каждого класса и гарантируем наличие всех трёх
+    class_counts = df['Pclass'].value_counts()
+    
+    # Создаем словарь со всеми классами (1, 2, 3)
+    all_classes = {1: 0, 2: 0, 3: 0}
+    for idx, val in class_counts.items():
+        if idx in [1, 2, 3]:  # Только допустимые классы
+            all_classes[idx] = val
+    
+    # Преобразуем в список для графика
+    counts_list = [all_classes[1], all_classes[2], all_classes[3]]
+    
+    ax.bar(['1 класс', '2 класс', '3 класс'], counts_list, 
+           color=['#3498db', '#2ecc71', '#e74c3c'])
+    ax.set_ylabel('Количество')
+    
+    # Добавляем подписи значений
+    for i, v in enumerate(counts_list):
+        ax.text(i, v + 0.5, str(v), ha='center')
+    
     st.pyplot(fig)
 
 # График 4: Пол
@@ -98,20 +127,52 @@ with tab4:
     st.subheader("Распределение по полу")
     fig, ax = plt.subplots()
     sex_counts = df['Sex'].value_counts()
-    ax.bar(sex_counts.index, sex_counts.values, color=['#3498db', '#e74c3c'])
+    
+    # Проверяем, что есть оба значения
+    sex_dict = {'male': 0, 'female': 0}
+    for idx, val in sex_counts.items():
+        sex_dict[idx] = val
+    
+    labels = ['Мужчины', 'Женщины']
+    ax.bar(labels, [sex_dict['male'], sex_dict['female']], 
+           color=['#3498db', '#e74c3c'])
+    ax.set_ylabel('Количество')
     st.pyplot(fig)
 
-# График 5: Цены с выбором класса
+# График 5: Цены с выбором класса (реагирует на пользователя)
 with tab5:
     st.subheader("Анализ цен билетов")
-    selected_class = st.selectbox("Выберите класс:", [1, 2, 3])
+    
+    # Получаем уникальные классы, которые есть в данных
+    available_classes = sorted(df['Pclass'].unique())
+    if len(available_classes) == 0:
+        available_classes = [1, 2, 3]
+    
+    selected_class = st.selectbox("Выберите класс:", available_classes)
+    
+    # Фильтруем данные по выбранному классу
     class_data = df[df['Pclass'] == selected_class]['Fare'].dropna()
     
     fig, ax = plt.subplots()
-    ax.hist(class_data, bins=20, color='#9b59b6', edgecolor='black')
-    ax.set_xlabel('Цена билета')
-    ax.set_ylabel('Количество')
-    ax.set_title(f'{selected_class} класс')
-    st.pyplot(fig)
     
-    st.write(f"Средняя цена: {class_data.mean():.2f}")
+    if len(class_data) > 0:
+        ax.hist(class_data, bins=20, color='#9b59b6', edgecolor='black')
+        ax.set_xlabel('Цена билета')
+        ax.set_ylabel('Количество')
+        ax.set_title(f'{selected_class} класс')
+        
+        # Добавляем статистику
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Средняя цена", f"{class_data.mean():.2f}")
+        with col2:
+            st.metric("Минимальная цена", f"{class_data.min():.2f}")
+        with col3:
+            st.metric("Максимальная цена", f"{class_data.max():.2f}")
+    else:
+        ax.text(0.5, 0.5, f'Нет данных о ценах для {selected_class} класса', ha='center')
+    
+    st.pyplot(fig)
+
+st.markdown("---")
+st.markdown("Дашборд для анализа данных пассажиров Титаника")
