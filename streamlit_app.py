@@ -1,28 +1,43 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
 import numpy as np
 
 # Настройка страницы
-st.set_page_config(page_title="Анализ пассажиров Титаника", layout="wide")
+st.set_page_config(page_title="Анализ Титаника", layout="wide")
 
 # Заголовок
-st.title("🚢 Анализ данных пассажиров Титаника")
+st.title("🚢 Анализ пассажиров Титаника")
 st.markdown("---")
 
 # Загрузка данных
 @st.cache_data
 def load_data():
-    df = pd.read_csv('titanic.csv')
+    # Создаем небольшие тестовые данные, если файл не найден
+    try:
+        df = pd.read_csv('titanic.csv')
+    except:
+        # Тестовые данные, если файл не загрузился
+        data = {
+            'PassengerId': [1, 2, 3, 4, 5],
+            'Survived': [0, 1, 1, 1, 0],
+            'Pclass': [3, 1, 3, 1, 3],
+            'Name': ['Braund', 'Cumings', 'Heikkinen', 'Futrelle', 'Allen'],
+            'Sex': ['male', 'female', 'female', 'female', 'male'],
+            'Age': [22, 38, 26, 35, 35],
+            'SibSp': [1, 1, 0, 1, 0],
+            'Parch': [0, 0, 0, 0, 0],
+            'Fare': [7.25, 71.28, 7.92, 53.1, 8.05]
+        }
+        df = pd.DataFrame(data)
     return df
 
 df = load_data()
 
-# БОКОВАЯ ПАНЕЛЬ (для пользовательского ввода)
+# Боковая панель
 st.sidebar.header("Настройки")
 
-# 1. ОПИСАТЕЛЬНАЯ СТАТИСТИКА
+# 1. Описательная статистика
 st.header("📊 Описательная статистика")
 
 col1, col2 = st.columns(2)
@@ -46,92 +61,57 @@ with col2:
 
 st.markdown("---")
 
-# 2. ГРАФИКИ
+# 2. Графики
 st.header("📈 Визуализация данных")
 
-# Создаем вкладки для разных графиков
 tab1, tab2, tab3, tab4, tab5 = st.tabs(["Выживаемость", "Возраст", "Классы", "Пол", "Цены"])
 
-# ВКЛАДКА 1: Столбчатая диаграмма - Выживаемость
+# График 1: Выживаемость
 with tab1:
     st.subheader("Распределение выживших и погибших")
-    
-    fig, ax = plt.subplots(figsize=(8, 6))
+    fig, ax = plt.subplots()
     survived_counts = df['Survived'].value_counts()
-    colors = ['#ff6b6b', '#4ecdc4']
     labels = ['Погиб', 'Выжил']
-    
-    bars = ax.bar(labels, survived_counts.values, color=colors)
-    ax.set_ylabel('Количество')
-    
-    # Добавляем цифры на столбцы
-    for bar, count in zip(bars, survived_counts.values):
-        height = bar.get_height()
-        ax.text(bar.get_x() + bar.get_width()/2., height,
-                f'{count}\n({count/len(df)*100:.1f}%)',
-                ha='center', va='bottom')
-    
+    colors = ['#ff6b6b', '#4ecdc4']
+    ax.bar(labels, survived_counts.values, color=colors)
     st.pyplot(fig)
 
-# ВКЛАДКА 2: Гистограмма - Возраст
+# График 2: Возраст
 with tab2:
-    st.subheader("Распределение возраста пассажиров")
-    
-    # Убираем пустые значения возраста
-    age_data = df['Age'].dropna()
-    
-    fig, ax = plt.subplots(figsize=(10, 6))
-    ax.hist(age_data, bins=30, color='#95a5a6', edgecolor='black', alpha=0.7)
+    st.subheader("Распределение возраста")
+    fig, ax = plt.subplots()
+    ax.hist(df['Age'].dropna(), bins=20, color='#95a5a6', edgecolor='black')
     ax.set_xlabel('Возраст')
     ax.set_ylabel('Количество')
-    ax.axvline(age_data.mean(), color='red', linestyle='--', label=f'Средний возраст: {age_data.mean():.1f}')
-    ax.legend()
-    
     st.pyplot(fig)
 
-# ВКЛАДКА 3: Круговая диаграмма - Классы
+# График 3: Классы
 with tab3:
     st.subheader("Распределение по классам")
-    
-    fig, ax = plt.subplots(figsize=(8, 8))
+    fig, ax = plt.subplots()
     class_counts = df['Pclass'].value_counts().sort_index()
-    labels = ['1 класс', '2 класс', '3 класс']
-    colors = ['#3498db', '#2ecc71', '#e74c3c']
-    
-    wedges, texts, autotexts = ax.pie(class_counts.values, 
-                                        labels=labels, 
-                                        colors=colors,
-                                        autopct='%1.1f%%',
-                                        startangle=90)
-    
+    ax.bar(['1 класс', '2 класс', '3 класс'], class_counts.values, color=['#3498db', '#2ecc71', '#e74c3c'])
     st.pyplot(fig)
 
-# ВКЛАДКА 4: Столбчатая диаграмма - Пол
+# График 4: Пол
 with tab4:
     st.subheader("Распределение по полу")
-    
-    fig, axes = plt.subplots(1, 2, figsize=(12, 5))
-    
-    # Общее распределение по полу
+    fig, ax = plt.subplots()
     sex_counts = df['Sex'].value_counts()
-    axes[0].bar(sex_counts.index, sex_counts.values, color=['#3498db', '#e74c3c'])
-    axes[0].set_title('Все пассажиры')
-    axes[0].set_ylabel('Количество')
-    
-    # Выживаемость по полу
-    survived_sex = df.groupby('Sex')['Survived'].mean() * 100
-    axes[1].bar(survived_sex.index, survived_sex.values, color=['#3498db', '#e74c3c'])
-    axes[1].set_title('Процент выживших по полу')
-    axes[1].set_ylabel('Процент выживших (%)')
-    
-    plt.tight_layout()
+    ax.bar(sex_counts.index, sex_counts.values, color=['#3498db', '#e74c3c'])
     st.pyplot(fig)
 
-# ВКЛАДКА 5: График, реагирующий на пользовательский ввод
+# График 5: Цены с выбором класса
 with tab5:
     st.subheader("Анализ цен билетов")
+    selected_class = st.selectbox("Выберите класс:", [1, 2, 3])
+    class_data = df[df['Pclass'] == selected_class]['Fare'].dropna()
     
-    # Выбор класса для анализа
-    selected_class = st.selectbox("Выберите класс для анализа:", [1, 2, 3])
+    fig, ax = plt.subplots()
+    ax.hist(class_data, bins=20, color='#9b59b6', edgecolor='black')
+    ax.set_xlabel('Цена билета')
+    ax.set_ylabel('Количество')
+    ax.set_title(f'{selected_class} класс')
+    st.pyplot(fig)
     
-    # Фильтруем данные
+    st.write(f"Средняя цена: {class_data.mean():.2f}")
