@@ -237,7 +237,7 @@ with tab5:
 
 # Дополнительная информация
 st.markdown("---")
-st.header("📋 Summary Statistics")
+st.header("Summary Statistics")
 
 if st.checkbox("Show detailed statistics"):
     st.subheader("Survival Statistics by Category")
