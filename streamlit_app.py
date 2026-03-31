@@ -114,6 +114,7 @@ with tab2:
         st.metric("Missing Ages", df['Age'].isna().sum())
 
 # ГРАФИК 3: Классы
+# ГРАФИК 3: Классы (КРУГОВАЯ ДИАГРАММА - 3-й тип)
 with tab3:
     st.subheader("Passenger Class Distribution")
     
@@ -125,14 +126,15 @@ with tab3:
         class_labels = ['1st Class', '2nd Class', '3rd Class']
         colors = ['#3498db', '#2ecc71', '#e74c3c']
         
-        bars = ax.bar(class_labels, class_counts.values, color=colors)
-        ax.set_ylabel('Number of Passengers')
-        ax.set_title('Passenger Class Distribution')
+        # КРУГОВАЯ ДИАГРАММА (pie chart)
+        wedges, texts, autotexts = ax.pie(class_counts.values, 
+                                           labels=class_labels,
+                                           colors=colors,
+                                           autopct='%1.1f%%',
+                                           startangle=90,
+                                           explode=(0.05, 0.05, 0.05))
         
-        for bar, count in zip(bars, class_counts.values):
-            height = bar.get_height()
-            ax.text(bar.get_x() + bar.get_width()/2., height,
-                    str(count), ha='center', va='bottom')
+        ax.set_title('Passenger Class Distribution')
         
         st.pyplot(fig)
     
@@ -142,7 +144,6 @@ with tab3:
             count = class_counts.iloc[i]
             survival = df[df['Pclass'] == i+1]['Survived'].mean() * 100
             st.metric(f"{label}", f"{count} passengers", f"{survival:.1f}% survived")
-
 # ГРАФИК 4: Пол
 with tab4:
     st.subheader("Gender Analysis")
