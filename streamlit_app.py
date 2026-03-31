@@ -9,23 +9,19 @@ matplotlib.rcParams['font.family'] = 'DejaVu Sans'
 st.set_page_config(page_title="Titanic Dashboard", layout="wide")
 
 # Заголовок
-st.title("🚢 Titanic Passenger Analysis")
+st.title("Titanic Passenger Analysis")
 st.markdown("---")
-
-# ЗАГРУЗКА ДАННЫХ (БЕЗ ТЕСТОВЫХ ДАННЫХ)
+# берем данные из файла титаник.ссв
 @st.cache_data
 def load_data():
     df = pd.read_csv('titanic.csv')
     return df
-
 df = load_data()
 
-# Боковая панель
-st.sidebar.header("Settings")
-st.sidebar.info("Use the tabs below to explore different aspects of the data")
 
-# 1. ОПИСАТЕЛЬНАЯ СТАТИСТИКА
-st.header("📊 Descriptive Statistics")
+
+# ОПИСАТЕЛЬНАЯ СТАТИСТИКА
+st.header(" Descriptive Statistics")
 
 col1, col2 = st.columns(2)
 
@@ -40,32 +36,27 @@ with col1:
         'Data Type': df.dtypes.values
     })
     st.dataframe(dtypes_df, use_container_width=True)
-
 with col2:
     st.subheader("Preview Data")
     n_rows = st.selectbox("Number of rows to display:", [5, 10, 15, 20, 30, 50, 100], index=1)
     st.dataframe(df.head(n_rows), use_container_width=True)
-
 st.markdown("---")
 
-# 2. ГРАФИКИ
-st.header("📈 Data Visualization")
+# ГРАФИКИ
+st.header(" Data Visualization")
 
-# Создаем вкладки
+# вкладки
 tab1, tab2, tab3, tab4, tab5 = st.tabs(["Survival", "Age", "Class", "Gender", "Fare"])
 
-# ГРАФИК 1: Выживаемость
+# ГРАФИК 1 Выживаемость
 with tab1:
     st.subheader("Survival Distribution")
-    
     col1, col2 = st.columns([2, 1])
-    
     with col1:
         fig, ax = plt.subplots(figsize=(8, 5))
         survived_counts = df['Survived'].value_counts().sort_index()
         labels = ['Died (0)', 'Survived (1)']
         colors = ['#ff6b6b', '#4ecdc4']
-        
         bars = ax.bar(labels, survived_counts.values, color=colors)
         ax.set_ylabel('Number of Passengers')
         ax.set_title('Survival Count')
@@ -86,7 +77,7 @@ with tab1:
         st.metric("Survived", len(df[df['Survived']==1]))
         st.metric("Died", len(df[df['Survived']==0]))
 
-# ГРАФИК 2: Возраст
+# ГРАФИК 2 Возраст
 with tab2:
     st.subheader("Age Distribution")
     
@@ -113,8 +104,8 @@ with tab2:
         st.metric("Max Age", f"{age_data.max():.1f}")
         st.metric("Missing Ages", df['Age'].isna().sum())
 
-# ГРАФИК 3: Классы
-# ГРАФИК 3: Классы (КРУГОВАЯ ДИАГРАММА - 3-й тип)
+
+# ГРАФИК 3: Классы КРУГОВАЯ ДИАГРАММА
 with tab3:
     st.subheader("Passenger Class Distribution")
     
@@ -126,7 +117,6 @@ with tab3:
         class_labels = ['1st Class', '2nd Class', '3rd Class']
         colors = ['#3498db', '#2ecc71', '#e74c3c']
         
-        # КРУГОВАЯ ДИАГРАММА (pie chart)
         wedges, texts, autotexts = ax.pie(class_counts.values, 
                                            labels=class_labels,
                                            colors=colors,
@@ -144,7 +134,7 @@ with tab3:
             count = class_counts.iloc[i]
             survival = df[df['Pclass'] == i+1]['Survived'].mean() * 100
             st.metric(f"{label}", f"{count} passengers", f"{survival:.1f}% survived")
-# ГРАФИК 4: Пол
+# ГРАФИК 4 Пол
 with tab4:
     st.subheader("Gender Analysis")
     
@@ -183,7 +173,7 @@ with tab4:
         
         st.pyplot(fig)
 
-# ГРАФИК 5: Цены (реагирует на пользователя)
+# ГРАФИК 5: Цены
 with tab5:
     st.subheader("Fare Analysis by Class")
     
@@ -255,6 +245,4 @@ if st.checkbox("Show detailed statistics"):
     summary_df = pd.DataFrame(summary_data)
     st.dataframe(summary_df, use_container_width=True)
 
-# Подвал
-st.markdown("---")
-st.markdown("📊 **Titanic Passenger Analysis Dashboard** | Created with Streamlit")
+
