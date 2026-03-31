@@ -9,28 +9,13 @@ matplotlib.rcParams['font.family'] = 'DejaVu Sans'
 st.set_page_config(page_title="Titanic Dashboard", layout="wide")
 
 # Заголовок
-st.title("Titanic Passenger Analysis")
+st.title("🚢 Titanic Passenger Analysis")
 st.markdown("---")
 
-# Загрузка данных
+# ЗАГРУЗКА ДАННЫХ (БЕЗ ТЕСТОВЫХ ДАННЫХ)
 @st.cache_data
 def load_data():
-    try:
-        df = pd.read_csv('titanic.csv')
-    except:
-        # Тестовые данные, если файл не загрузился
-        data = {
-            'PassengerId': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-            'Survived': [0, 1, 1, 1, 0, 0, 0, 0, 1, 1],
-            'Pclass': [3, 1, 3, 1, 3, 3, 1, 3, 3, 2],
-            'Name': ['Braund', 'Cumings', 'Heikkinen', 'Futrelle', 'Allen', 'Moran', 'McCarthy', 'Palsson', 'Johnson', 'Nasser'],
-            'Sex': ['male', 'female', 'female', 'female', 'male', 'male', 'male', 'male', 'female', 'female'],
-            'Age': [22, 38, 26, 35, 35, None, 54, 2, 27, 14],
-            'SibSp': [1, 1, 0, 1, 0, 0, 0, 3, 0, 1],
-            'Parch': [0, 0, 0, 0, 0, 0, 0, 1, 2, 0],
-            'Fare': [7.25, 71.28, 7.92, 53.1, 8.05, 8.46, 51.86, 21.08, 11.13, 30.07]
-        }
-        df = pd.DataFrame(data)
+    df = pd.read_csv('titanic.csv')
     return df
 
 df = load_data()
@@ -40,7 +25,7 @@ st.sidebar.header("Settings")
 st.sidebar.info("Use the tabs below to explore different aspects of the data")
 
 # 1. ОПИСАТЕЛЬНАЯ СТАТИСТИКА
-st.header(" Descriptive Statistics")
+st.header("📊 Descriptive Statistics")
 
 col1, col2 = st.columns(2)
 
@@ -58,13 +43,13 @@ with col1:
 
 with col2:
     st.subheader("Preview Data")
-    n_rows = st.selectbox("Number of rows to display:", [5, 10, 15, 20, 30, 50], index=1)
+    n_rows = st.selectbox("Number of rows to display:", [5, 10, 15, 20, 30, 50, 100], index=1)
     st.dataframe(df.head(n_rows), use_container_width=True)
 
 st.markdown("---")
 
 # 2. ГРАФИКИ
-st.header(" Data Visualization")
+st.header("📈 Data Visualization")
 
 # Создаем вкладки
 tab1, tab2, tab3, tab4, tab5 = st.tabs(["Survival", "Age", "Class", "Gender", "Fare"])
@@ -85,7 +70,6 @@ with tab1:
         ax.set_ylabel('Number of Passengers')
         ax.set_title('Survival Count')
         
-        # Добавляем цифры на столбцы
         for bar, count in zip(bars, survived_counts.values):
             height = bar.get_height()
             ax.text(bar.get_x() + bar.get_width()/2., height,
@@ -106,7 +90,6 @@ with tab1:
 with tab2:
     st.subheader("Age Distribution")
     
-    # Убираем пустые значения
     age_data = df['Age'].dropna()
     
     col1, col2 = st.columns([2, 1])
@@ -146,7 +129,6 @@ with tab3:
         ax.set_ylabel('Number of Passengers')
         ax.set_title('Passenger Class Distribution')
         
-        # Добавляем цифры
         for bar, count in zip(bars, class_counts.values):
             height = bar.get_height()
             ax.text(bar.get_x() + bar.get_width()/2., height,
@@ -186,7 +168,6 @@ with tab4:
     with col2:
         fig, ax = plt.subplots(figsize=(6, 4))
         
-        # Процент выживания по полу
         survival_by_sex = df.groupby('Sex')['Survived'].mean() * 100
         
         bars = ax.bar(survival_by_sex.index, survival_by_sex.values, color=colors)
@@ -205,10 +186,8 @@ with tab4:
 with tab5:
     st.subheader("Fare Analysis by Class")
     
-    # Выбор класса
     selected_class = st.radio("Select Passenger Class:", [1, 2, 3], horizontal=True)
     
-    # Фильтруем данные
     class_data = df[df['Pclass'] == selected_class]['Fare'].dropna()
     
     if len(class_data) > 0:
@@ -237,12 +216,11 @@ with tab5:
 
 # Дополнительная информация
 st.markdown("---")
-st.header("Summary Statistics")
+st.header("📋 Summary Statistics")
 
 if st.checkbox("Show detailed statistics"):
     st.subheader("Survival Statistics by Category")
     
-    # Создаем сводную таблицу
     summary_data = []
     
     # Overall
@@ -278,4 +256,4 @@ if st.checkbox("Show detailed statistics"):
 
 # Подвал
 st.markdown("---")
-st.markdown(" **Titanic Passenger Analysis Dashboard** | Created with Streamlit")
+st.markdown("📊 **Titanic Passenger Analysis Dashboard** | Created with Streamlit")
