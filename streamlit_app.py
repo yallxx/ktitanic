@@ -7,7 +7,6 @@ matplotlib.rcParams['font.family'] = 'DejaVu Sans'
 
 # Настройка страницы
 st.set_page_config(page_title="Titanic Dashboard", layout="wide")
-
 # Заголовок
 st.title("Titanic Passenger Analysis")
 st.markdown("---")
@@ -18,18 +17,14 @@ def load_data():
     return df
 df = load_data()
 
-
-
 # ОПИСАТЕЛЬНАЯ СТАТИСТИКА
 st.header(" Descriptive Statistics")
-
 col1, col2 = st.columns(2)
 
 with col1:
     st.subheader("Dataset Information")
     st.write(f"**Number of rows:** {df.shape[0]}")
     st.write(f"**Number of columns:** {df.shape[1]}")
-    
     st.subheader("Data Types")
     dtypes_df = pd.DataFrame({
         'Column': df.columns,
@@ -44,10 +39,8 @@ st.markdown("---")
 
 # ГРАФИКИ
 st.header(" Data Visualization")
-
 # вкладки
 tab1, tab2, tab3, tab4, tab5 = st.tabs(["Survival", "Age", "Class", "Gender", "Fare"])
-
 # ГРАФИК 1 Выживаемость
 with tab1:
     st.subheader("Survival Distribution")
@@ -60,13 +53,11 @@ with tab1:
         bars = ax.bar(labels, survived_counts.values, color=colors)
         ax.set_ylabel('Number of Passengers')
         ax.set_title('Survival Count')
-        
         for bar, count in zip(bars, survived_counts.values):
             height = bar.get_height()
             ax.text(bar.get_x() + bar.get_width()/2., height,
                     f'{count}\n({count/len(df)*100:.1f}%)',
                     ha='center', va='bottom')
-        
         st.pyplot(fig)
     
     with col2:
@@ -95,7 +86,6 @@ with tab2:
         ax.legend()
         
         st.pyplot(fig)
-    
     with col2:
         st.subheader("Age Statistics")
         st.metric("Mean Age", f"{age_data.mean():.1f}")
@@ -104,11 +94,9 @@ with tab2:
         st.metric("Max Age", f"{age_data.max():.1f}")
         st.metric("Missing Ages", df['Age'].isna().sum())
 
-
 # ГРАФИК 3: Классы КРУГОВАЯ ДИАГРАММА
 with tab3:
     st.subheader("Passenger Class Distribution")
-    
     col1, col2 = st.columns([2, 1])
     
     with col1:
@@ -116,7 +104,6 @@ with tab3:
         class_counts = df['Pclass'].value_counts().sort_index()
         class_labels = ['1st Class', '2nd Class', '3rd Class']
         colors = ['#3498db', '#2ecc71', '#e74c3c']
-        
         wedges, texts, autotexts = ax.pie(class_counts.values, 
                                            labels=class_labels,
                                            colors=colors,
@@ -125,7 +112,6 @@ with tab3:
                                            explode=(0.05, 0.05, 0.05))
         
         ax.set_title('Passenger Class Distribution')
-        
         st.pyplot(fig)
     
     with col2:
@@ -137,18 +123,15 @@ with tab3:
 # ГРАФИК 4 Пол
 with tab4:
     st.subheader("Gender Analysis")
-    
     col1, col2 = st.columns(2)
     
     with col1:
         fig, ax = plt.subplots(figsize=(6, 4))
         sex_counts = df['Sex'].value_counts()
         colors = ['#3498db', '#e74c3c'] if 'male' in sex_counts.index else ['#e74c3c', '#3498db']
-        
         bars = ax.bar(sex_counts.index, sex_counts.values, color=colors)
         ax.set_ylabel('Number of Passengers')
         ax.set_title('Gender Distribution')
-        
         for bar, count in zip(bars, sex_counts.values):
             height = bar.get_height()
             ax.text(bar.get_x() + bar.get_width()/2., height,
@@ -176,11 +159,8 @@ with tab4:
 # ГРАФИК 5: Цены
 with tab5:
     st.subheader("Fare Analysis by Class")
-    
     selected_class = st.radio("Select Passenger Class:", [1, 2, 3], horizontal=True)
-    
     class_data = df[df['Pclass'] == selected_class]['Fare'].dropna()
-    
     if len(class_data) > 0:
         col1, col2 = st.columns([2, 1])
         
@@ -205,9 +185,9 @@ with tab5:
     else:
         st.warning(f"No fare data available for Class {selected_class}")
 
-# Дополнительная информация
+# Доп инфа
 st.markdown("---")
-st.header("📋 Summary Statistics")
+st.header("Summary Statistics")
 
 if st.checkbox("Show detailed statistics"):
     st.subheader("Survival Statistics by Category")
