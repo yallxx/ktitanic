@@ -75,7 +75,7 @@ with tab1:
         
         ax.axvline(x=0, color='black', linewidth=0.5)
         ax.set_xlabel('Number of Passengers')
-        ax.set_title('Survival Waterfall Chart', fontsize=14, fontweight='bold')
+        
         
         st.pyplot(fig)
     
@@ -101,7 +101,7 @@ with tab2:
         ax.hist(age_data, bins=20, color='#95a5a6', edgecolor='black', alpha=0.7)
         ax.set_xlabel('Age')
         ax.set_ylabel('Number of Passengers')
-        ax.set_title('Age Distribution')
+        
         ax.axvline(age_data.mean(), color='red', linestyle='--', linewidth=2, label=f'Mean: {age_data.mean():.1f}')
         ax.legend()
         
