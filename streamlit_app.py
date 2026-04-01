@@ -42,29 +42,49 @@ st.header(" Data Visualization")
 # вкладки
 tab1, tab2, tab3, tab4, tab5 = st.tabs(["Survival", "Age", "Class", "Gender", "Fare"])
 # ГРАФИК 1 Выживаемость
+# ГРАФИК 1 Выживаемость - Водопадная диаграмма
 with tab1:
     st.subheader("Survival Distribution")
     col1, col2 = st.columns([2, 1])
+    
     with col1:
         fig, ax = plt.subplots(figsize=(8, 5))
-        survived_counts = df['Survived'].value_counts().sort_index()
-        labels = ['Died (0)', 'Survived (1)']
-        colors = ['#ff6b6b', '#4ecdc4']
-        bars = ax.bar(labels, survived_counts.values, color=colors)
-        ax.set_ylabel('Number of Passengers')
-        ax.set_title('Survival Count')
-        for bar, count in zip(bars, survived_counts.values):
-            height = bar.get_height()
-            ax.text(bar.get_x() + bar.get_width()/2., height,
-                    f'{count}\n({count/len(df)*100:.1f}%)',
-                    ha='center', va='bottom')
+        
+        # Данные
+        died = len(df[df['Survived']==0])
+        survived = len(df[df['Survived']==1])
+        
+        # Создаем водопадную диаграмму
+        categories = ['Total\nPassengers', 'Died', 'Survived']
+        values = [len(df), -died, survived]
+        
+        # Цвета для каждого столбца
+        colors_waterfall = ['#95a5a6', '#ff6b6b', '#4ecdc4']
+        
+        # Строим горизонтальные столбцы
+        bars = ax.barh(categories, values, color=colors_waterfall, edgecolor='black', linewidth=1.5)
+        
+        # Добавляем значения на столбцы
+        for i, (bar, val) in enumerate(zip(bars, values)):
+            if val > 0:
+                ax.text(val + 10, bar.get_y() + bar.get_height()/2, 
+                       f'{int(val)}', ha='left', va='center', fontweight='bold')
+            else:
+                ax.text(val - 10, bar.get_y() + bar.get_height()/2, 
+                       f'{int(abs(val))}', ha='right', va='center', fontweight='bold')
+        
+        ax.axvline(x=0, color='black', linewidth=0.5)
+        ax.set_xlabel('Number of Passengers')
+        ax.set_title('Survival Waterfall Chart', fontsize=14, fontweight='bold')
+        
         st.pyplot(fig)
     
     with col2:
         st.subheader("Statistics")
         survival_rate = df['Survived'].mean() * 100
         st.metric("Survival Rate", f"{survival_rate:.1f}%")
-        st.metric("Total Passengers", len(df))
+        st.metric("Survival Ratio", f"1:{int((100-survival_rate)/survival_rate)}", 
+                  delta="Died:Survived")
         st.metric("Survived", len(df[df['Survived']==1]))
         st.metric("Died", len(df[df['Survived']==0]))
 
